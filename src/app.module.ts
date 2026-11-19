@@ -1,0 +1,25 @@
+import { Module } from '@nestjs/common';
+import { ApiExceptionFilter } from './api-exception.filter';
+import { ApiFallbackController } from './api-fallback.controller';
+import { AuthController } from './auth.controller';
+import { CatalogController } from './catalog.controller';
+import { InspectionsController } from './inspections.controller';
+import { InspectionStore } from './inspection.store';
+import { HomeController } from './home.controller';
+import { OperationsController } from './operations.controller';
+import { GoogleWebAppClient } from './google-web-app.client';
+import { DrivePhotoController } from './drive-photo.controller';
+
+@Module({
+  controllers: [
+    AuthController,
+    CatalogController,
+    InspectionsController,
+    HomeController,
+    OperationsController,
+    DrivePhotoController,
+    ApiFallbackController,
+  ],
+  providers: [ApiExceptionFilter, InspectionStore, GoogleWebAppClient],
+})
+export class AppModule {}
