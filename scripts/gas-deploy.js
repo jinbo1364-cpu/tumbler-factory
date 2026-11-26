@@ -1,4 +1,4 @@
-﻿const { spawnSync } = require('node:child_process');
+const { spawnSync } = require('node:child_process');
 const { existsSync, readFileSync, writeFileSync } = require('node:fs');
 
 if (process.env.GAS_WEBAPP_URL) {

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -346,6 +346,56 @@
 
       .inspection-tab-panel { min-height: 48px; padding-top: 18px; }
 
+      .judgment-section { display: grid; gap: 22px; }
+
+      .judgment-section h2 { margin: 0; font-size: 22px; }
+
+      .judgment-group { margin: 0; padding: 0; border: 0; }
+
+      .judgment-group legend { margin-bottom: 10px; font-weight: 700; }
+
+      .judgment-options { display: flex; flex-wrap: wrap; gap: 10px; }
+
+      .judgment-options button {
+        width: auto;
+        margin: 0;
+        padding: 11px 16px;
+        border: 1px solid #c9d8ce;
+        color: #40584d;
+        background: #edf2ee;
+      }
+
+      .judgment-options button[aria-pressed="true"] { color: #fff; }
+
+      .judgment-options button[data-judgment="OK"][aria-pressed="true"] {
+        border-color: #28744b;
+        background: #28744b;
+      }
+
+      .judgment-options button[data-judgment="NG"][aria-pressed="true"] {
+        border-color: #b42318;
+        background: #b42318;
+      }
+
+      .judgment-options button[data-judgment="HOLD"][aria-pressed="true"] {
+        border-color: #b87500;
+        background: #b87500;
+      }
+
+      .judgment-options button[data-defect][aria-pressed="true"] {
+        border-color: #276447;
+        color: #fff;
+        background: #276447;
+      }
+
+      .detail-record-history { margin-top: 24px; padding-top: 18px; border-top: 1px solid #d8e3dc; }
+
+      .detail-record-history summary { color: #276447; font-weight: 750; cursor: pointer; }
+
+      .detail-record-history ol { display: grid; gap: 10px; padding-left: 24px; }
+
+      .detail-record-history li { padding: 12px; border-radius: 8px; background: #f2f6f3; line-height: 1.6; overflow-wrap: anywhere; }
+
       .inspection-detail-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
@@ -407,6 +457,61 @@
 
       .detail-edit button { margin-top: 18px; }
 
+      .gemini-result { display: grid; gap: 14px; }
+
+      .gemini-result-heading { display: flex; align-items: center; gap: 12px; }
+
+      .gemini-result-heading h3 { margin: 0; }
+
+      .gemini-result-badge { padding: 5px 10px; border-radius: 999px; color: #315b45; background: #edf5ef; font-size: 14px; font-weight: 750; }
+
+      .gemini-result-badge.review-needed { color: #755500; background: #fff1bf; }
+
+      .gemini-result button { width: fit-content; margin: 0; padding: 10px 16px; }
+
+      .evidence-review { margin-top: 22px; padding-top: 18px; border-top: 1px solid #d8e3dc; }
+
+      .evidence-review h3 { margin-top: 0; }
+
+      .evidence-review .evidence-check { display: flex; align-items: center; gap: 9px; margin: 12px 0; }
+
+      .evidence-review .evidence-check input { width: auto; margin: 0; }
+
+      .evidence-review button { margin-top: 12px; }
+
+      .gemini-run-controls { display: grid; grid-template-columns: minmax(140px, 0.7fr) minmax(220px, 1.4fr) auto; align-items: end; gap: 12px; }
+
+      .gemini-run-controls label { margin-top: 0; }
+
+      .gemini-result-fields { display: grid; gap: 12px; margin: 0; }
+
+      .gemini-result-fields div { padding: 14px; border: 1px solid #d8e3dc; border-radius: 10px; background: #fbfcfb; }
+
+      .gemini-result-fields dt { margin-bottom: 6px; color: #52665b; font-weight: 700; }
+
+      .gemini-result-fields dd { margin: 0; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+      .gemini-result-fields .gemini-decision dd { font-size: 24px; font-weight: 800; }
+
+      .gemini-result-message { margin: 0; color: #52665b; }
+
+      .gemini-comparison { display: grid; gap: 14px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #d8e3dc; }
+
+      .gemini-comparison h3 { margin: 0; }
+
+      .gemini-comparison-selectors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+      .gemini-comparison-table-wrap { overflow-x: auto; }
+
+      .gemini-comparison-table { width: 100%; min-width: 600px; border-collapse: collapse; }
+
+      .gemini-comparison-table th,
+      .gemini-comparison-table td { padding: 12px; border: 1px solid #d8e3dc; text-align: left; vertical-align: top; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+      .gemini-comparison-table thead th { background: #edf5ef; }
+
+      .gemini-comparison-table tbody th { width: 150px; color: #52665b; background: #fbfcfb; }
+
       @media (max-width: 680px) {
         .inspection-detail-grid { grid-template-columns: 1fr; }
       }
@@ -429,12 +534,191 @@
         text-decoration: none;
       }
 
+      /* Cobalt/Relay-inspired visual theme. Keep content and behavior unchanged. */
+      :root {
+        color: #edf3ff;
+        background: #09111f;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color-scheme: dark;
+        --ink: #09111f;
+        --panel: #101c2d;
+        --panel-raised: #142238;
+        --line: #293a52;
+        --muted: #91a3ba;
+        --text: #edf3ff;
+        --blue: #5d8dff;
+        --blue-bright: #82a8ff;
+        --mint: #58d6b0;
+      }
+
+      body {
+        color: var(--text);
+        background-color: var(--ink);
+        background-image: linear-gradient(rgb(109 143 190 / 5%) 1px, transparent 1px), linear-gradient(90deg, rgb(109 143 190 / 5%) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+
+      .app-header {
+        min-height: 68px;
+        padding: 10px clamp(18px, 4vw, 56px);
+        background: rgb(9 17 31 / 94%);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 10px 28px rgb(0 0 0 / 18%);
+      }
+
+      .brand-link { gap: 10px; color: var(--text); font-size: 16px; letter-spacing: -0.02em; }
+      .brand-emoji {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid #334966;
+        border-radius: 10px;
+        color: #9bbcff;
+        background: #14243a;
+        font-size: 21px;
+        line-height: 1;
+      }
+      .header-actions { gap: 18px; }
+      .header-actions nav { gap: 18px; }
+      .header-actions a { color: #b7c9e5; font-size: 14px; text-decoration: none; }
+      .header-actions a:hover { color: var(--blue-bright); }
+      .header-user { color: var(--muted); font-size: 13px; }
+
+      .yellow-notice {
+        padding: 10px clamp(18px, 4vw, 56px);
+        color: #b9c7dc;
+        background: #111d2d;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+      }
+
+      .page-content { place-items: start center; padding: clamp(28px, 5vw, 64px) 22px; }
+      #app-screen { width: min(100%, 1120px); }
+      .screen-heading { align-items: end; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+      #app-screen h1 { color: #000; font-size: clamp(28px, 4vw, 38px); letter-spacing: -0.045em; }
+      h2, h3, h4 { color: var(--text); letter-spacing: -0.025em; }
+      p, dt, label { color: #bfccdf; }
+      .screen-view { margin-top: 0; }
+
+      .login-box,
+      #inspection-new-view,
+      #inspection-detail-content,
+      #settings-view {
+        color: var(--text);
+        background: linear-gradient(145deg, rgb(20 34 56 / 96%), rgb(13 25 42 / 96%));
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        box-shadow: 0 24px 70px rgb(0 0 0 / 28%);
+      }
+
+      .login-box { margin: auto; }
+      .login-box h1 { color: var(--text); font-size: 26px; }
+      #inspection-new-view, #inspection-detail-content, #settings-view { padding: clamp(18px, 3vw, 32px); }
+
+      input, select, textarea {
+        color: var(--text);
+        background: #0b1626;
+        border: 1px solid #344963;
+        border-radius: 8px;
+        outline: none;
+      }
+      input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgb(93 141 255 / 18%); }
+      input::placeholder, textarea::placeholder { color: #71839c; }
+
+      button {
+        color: #f7faff;
+        background: var(--blue);
+        border: 1px solid var(--blue);
+        border-radius: 8px;
+        box-shadow: none;
+        font-weight: 700;
+        transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+      }
+      button:hover { background: #4778eb; border-color: #4778eb; }
+      button:active { transform: translateY(1px); }
+      button:disabled { color: #8595aa; background: #28374b; border-color: #34445b; }
+      .logout-button { color: #dbe6f7; background: transparent; border-color: #3a4b63; }
+      .logout-button:hover { color: #fff; background: #192a40; border-color: #567096; }
+
+      .home-summary-cards { gap: 12px; margin-top: 18px; }
+      .home-summary-card {
+        min-height: 112px;
+        padding: 18px;
+        color: var(--text);
+        text-align: left;
+        background: linear-gradient(145deg, #14243a, #101c2d);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .home-summary-card span { color: var(--muted); font-size: 13px; }
+      .home-summary-card strong { margin-top: 14px; color: #f4f7ff; font-size: 30px; font-variant-numeric: tabular-nums; }
+      .home-summary-card:hover { background: #192b45; border-color: #49658b; }
+      .home-summary-card[aria-pressed="true"] { background: #1a2d4c; border: 1px solid var(--blue); box-shadow: 0 0 0 2px rgb(93 141 255 / 14%); }
+      .home-inspection-list { gap: 10px; margin-top: 16px; }
+      .home-inspection-card { color: var(--text); background: #101c2d; border-color: var(--line); border-radius: 12px; }
+      .home-inspection-card:hover { background: #14243a; border-color: #405a7c; }
+      .home-inspection-card img, .home-inspection-card .no-photo { border-radius: 8px; background: #0b1626; }
+
+      .inspection-tabs { border-bottom-color: var(--line); }
+      .inspection-tabs [role="tab"] { color: var(--muted); background: transparent; border-color: transparent; border-radius: 8px 8px 0 0; }
+      .inspection-tabs [role="tab"][aria-selected="true"] { color: #dce7ff; background: #15243a; border-color: var(--line); border-bottom-color: #15243a; }
+      .inspection-tab-panel { color: var(--text); }
+      .inspection-summary, .detail-values > div, .gemini-result-fields > div { background: #101c2d; border-color: var(--line); border-radius: 10px; }
+      .inspection-summary strong, .detail-values dd, .gemini-result-fields dd { color: #f1eadb; }
+      #inspection-detail-content,
+      #inspection-detail-content p,
+      #inspection-detail-content label,
+      #inspection-detail-content dt,
+      #inspection-detail-content dd,
+      #inspection-detail-content li,
+      #inspection-detail-content summary,
+      #inspection-detail-content .gemini-result-message,
+      #inspection-detail-content .weight-range { color: #000; }
+      #inspection-detail-content h1,
+      #inspection-detail-content h2,
+      #inspection-detail-content h3,
+      #inspection-detail-content h4,
+      #inspection-detail-content .inspection-summary strong,
+      #inspection-detail-content .detail-values dd,
+      #inspection-detail-content .gemini-result-fields dd { color: #000; }
+      #inspection-detail-content dt,
+      #inspection-detail-content .gemini-result-fields dt { color: #000; }
+      #inspection-detail-content .gemini-result-fields > div { background: #f1eadb; }
+      #inspection-detail-content input,
+      #inspection-detail-content select,
+      #inspection-detail-content textarea { color: #000; background: #f1eadb; }
+      #inspection-detail-content .gemini-result-fields .gemini-decision dd { color: #000; }
+      #screen-title { color: #000; }
+      .gemini-result-badge { color: #d5e2fa; background: #243957; }
+      .gemini-result-badge.review-needed { color: #f6d77e; background: #473917; }
+      .gemini-result-fields dt { color: var(--muted); }
+      .gemini-result-fields .gemini-decision dd { color: var(--mint); }
+      .gemini-comparison { border-top-color: var(--line); }
+      .gemini-comparison-table th, .gemini-comparison-table td { border-color: var(--line); }
+      .gemini-comparison-table th { color: #cad8ec; background: #14243a; }
+      .detail-record-history { border-top-color: var(--line); }
+      .detail-record-history li { color: #c9d6e8; background: #142238; }
+      .evidence-reference, .evidence-review { border-color: var(--line); background: #101c2d; }
+      .error-message, [role="alert"] { color: #ff9b9b; }
+      .weight-range, .home-list-message, .gemini-result-message { color: var(--muted); }
+      a { color: var(--blue-bright); }
+      .app-footer { color: #8293aa; background: #09111f; border-top-color: var(--line); font-size: 13px; }
+
+      @media (max-width: 700px) {
+        .app-header { padding-inline: 16px; }
+        .header-actions, .header-actions nav { gap: 10px; }
+        .brand-link { font-size: 14px; }
+        .home-summary-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gemini-comparison-selectors { grid-template-columns: 1fr; }
+      }
+
     </style>
   </head>
   <body>
     <header class="app-header">
       <a class="brand-link" href="/" data-link aria-label="텀블러 공장 제조품질관리 홈">
-        <img src="/logo.svg" alt="" />
+        <span class="brand-emoji" aria-hidden="true">🧊</span>
         <span>텀블러 공장 제조품질관리</span>
       </a>
       <div id="header-actions" class="header-actions" hidden>
@@ -494,6 +778,24 @@
           <h2>저장소 상태</h2>
           <p id="storage-status" role="status">저장소 상태를 불러오는 중입니다.</p>
           <p id="gemini-status" role="status">Gemini 판독 상태를 불러오는 중입니다.</p>
+          <div class="prompt-settings">
+            <h2>Gemini 판독 지시</h2>
+            <label for="prompt-version">버전</label>
+            <select id="prompt-version" disabled></select>
+            <label for="prompt-text">지시문</label>
+            <textarea id="prompt-text" rows="12" disabled></textarea>
+            <button id="save-prompt" type="button" disabled>수정본 저장</button>
+            <p id="prompt-message" role="status" aria-live="polite"></p>
+          </div>
+          <div class="prompt-settings">
+            <h2>NotebookLM 근거 질문</h2>
+            <label for="notebooklm-prompt-version">버전</label>
+            <select id="notebooklm-prompt-version" disabled></select>
+            <label for="notebooklm-prompt-text">근거 질문</label>
+            <textarea id="notebooklm-prompt-text" rows="12" disabled></textarea>
+            <button id="save-notebooklm-prompt" type="button" disabled>수정본 저장</button>
+            <p id="notebooklm-prompt-message" role="status" aria-live="polite"></p>
+          </div>
         </section>
         <section id="inspection-new-view" class="screen-view" hidden>
           <form id="inspection-fields" class="inspection-fields">
@@ -565,8 +867,113 @@
                   </form>
                 </div>
               </div>
-              <p id="detail-placeholder" hidden></p>
+              <section id="detail-gemini-result" class="gemini-result" hidden aria-label="AI 판독 결과">
+                <div class="gemini-result-heading">
+                  <h3>AI 판독 결과</h3>
+                  <span id="detail-gemini-badge" class="gemini-result-badge" hidden></span>
+                </div>
+                <div class="gemini-run-controls">
+                  <div>
+                    <label for="detail-gemini-revision">검사기준</label>
+                    <select id="detail-gemini-revision" disabled>
+                      <option value="Rev.A">Rev.A</option>
+                      <option value="Rev.B">Rev.B</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="detail-gemini-prompt">지시문</label>
+                    <select id="detail-gemini-prompt" disabled></select>
+                  </div>
+                  <button id="detail-gemini-request" type="button" disabled>AI 판독 요청</button>
+                </div>
+                <p id="detail-gemini-request-error" class="error-message" role="alert" hidden></p>
+                <p id="detail-gemini-state" class="gemini-result-message" role="status" hidden></p>
+                <p id="detail-gemini-stale" class="weight-range" hidden>검사 기록이 바뀌기 전의 결과입니다. 다시 판독해 주세요.</p>
+                <div id="detail-gemini-fields"></div>
+                <section id="detail-gemini-comparison" class="gemini-comparison" hidden aria-label="판독 이력과 결과 비교">
+                  <h3>판독 이력과 결과 비교</h3>
+                  <div class="gemini-comparison-selectors">
+                    <div>
+                      <label for="detail-gemini-compare-left">첫 번째 결과</label>
+                      <select id="detail-gemini-compare-left"></select>
+                    </div>
+                    <div>
+                      <label for="detail-gemini-compare-right">두 번째 결과</label>
+                      <select id="detail-gemini-compare-right"></select>
+                    </div>
+                  </div>
+                  <div id="detail-gemini-comparison-output" class="gemini-comparison-table-wrap"></div>
+                </section>
+              </section>
+              <section id="detail-evidence-reference" class="evidence-reference" hidden aria-labelledby="detail-evidence-title">
+                <h2 id="detail-evidence-title">검사기준과 비교하기</h2>
+                <details id="detail-standard-source">
+                  <summary id="detail-standard-summary">검사기준 원문 읽기 · Rev.A</summary>
+                  <pre id="detail-standard-text" aria-live="polite"></pre>
+                </details>
+                <label for="detail-evidence-prompt">NotebookLM 근거 질문</label>
+                <select id="detail-evidence-prompt">
+                  <option value="v3">v3</option>
+                </select>
+                <button id="detail-evidence-request" type="button">근거 확인</button>
+                <p id="detail-evidence-guidance" class="gemini-result-message" role="status" aria-live="polite"></p>
+                <section id="detail-evidence-answer" class="gemini-result" hidden aria-label="NotebookLM 근거 답변">
+                  <p id="detail-evidence-mock" class="weight-range" hidden>모의 응답 — 실제 NotebookLM 연결 아님</p>
+                  <pre id="detail-evidence-answer-text"></pre>
+                  <p id="detail-evidence-sources"></p>
+                  <details id="detail-evidence-sent-question" hidden>
+                    <summary>NotebookLM에 보낸 질문 보기</summary>
+                    <pre id="detail-evidence-sent-question-text"></pre>
+                    <p id="detail-evidence-prompt-used"></p>
+                  </details>
+                  <section id="detail-evidence-review" class="evidence-review" hidden aria-label="출처 대조">
+                    <h3>기준 원문과 답변이 일치하나요?</h3>
+                    <p>원문을 열어 문서명·버전·내용을 답변과 비교하세요. 일치할 때만 아래 항목에 체크합니다.</p>
+                    <label class="evidence-check"><input id="detail-evidence-read-match" type="checkbox" /> 원문을 읽었고 답변과 일치합니다</label>
+                    <label class="evidence-check"><input id="detail-evidence-review-needed" type="checkbox" /> AI 판정이 이 기준과 맞지 않습니다(검토 필요)</label>
+                    <label for="detail-evidence-review-memo">메모</label>
+                    <input id="detail-evidence-review-memo" type="text" />
+                    <button id="detail-evidence-review-save" type="button" disabled>출처 대조 기록 저장</button>
+                    <p id="detail-evidence-review-error" class="error-message" role="alert" hidden></p>
+                  </section>
+                </section>
+              </section>
+              <section id="detail-judgment" class="judgment-section" hidden aria-labelledby="detail-judgment-title">
+                <h2 id="detail-judgment-title">내 판단 기록</h2>
+                <fieldset class="judgment-group">
+                  <legend>판정</legend>
+                  <div class="judgment-options" aria-label="판정 선택">
+                    <button type="button" data-judgment="OK" aria-pressed="false">정상 OK</button>
+                    <button type="button" data-judgment="NG" aria-pressed="false">불량 NG</button>
+                    <button type="button" data-judgment="HOLD" aria-pressed="false">보류 HOLD</button>
+                  </div>
+                </fieldset>
+                <fieldset class="judgment-group">
+                  <legend>불량</legend>
+                  <div class="judgment-options" aria-label="불량 선택">
+                    <button type="button" data-defect="D01" aria-pressed="false">스크래치</button>
+                    <button type="button" data-defect="D02" aria-pressed="false">찍힘</button>
+                    <button type="button" data-defect="D03" aria-pressed="false">라벨 오류</button>
+                    <button type="button" data-defect="D04" aria-pressed="false">뚜껑 조립 오류</button>
+                  </div>
+                </fieldset>
+                <div>
+                  <label for="detail-judgment-memo">조치 메모</label>
+                  <textarea id="detail-judgment-memo"></textarea>
+                  <label for="detail-judgment-change-reason">변경 사유</label>
+                  <input id="detail-judgment-change-reason" type="text" />
+                </div>
+                <div>
+                  <button id="detail-judgment-save" type="button">내 판단 저장</button>
+                  <p id="detail-judgment-save-error" class="error-message" role="alert" hidden></p>
+                </div>
+              </section>
             </div>
+            <details id="detail-record-history" class="detail-record-history">
+              <summary>변경 이력</summary>
+              <p id="detail-record-history-error" class="error-message" role="alert" hidden></p>
+              <ol id="detail-record-history-list"></ol>
+            </details>
           </div>
         </section>
         <section id="not-found-view" hidden>
@@ -595,7 +1002,17 @@
       const settingsView = document.querySelector('#settings-view');
       const storageStatus = document.querySelector('#storage-status');
       const geminiStatus = document.querySelector('#gemini-status');
+      const promptVersion = document.querySelector('#prompt-version');
+      const promptText = document.querySelector('#prompt-text');
+      const savePromptButton = document.querySelector('#save-prompt');
+      const promptMessage = document.querySelector('#prompt-message');
+      const notebookLMPromptVersion = document.querySelector('#notebooklm-prompt-version');
+      const notebookLMPromptText = document.querySelector('#notebooklm-prompt-text');
+      const saveNotebookLMPromptButton = document.querySelector('#save-notebooklm-prompt');
+      const notebookLMPromptMessage = document.querySelector('#notebooklm-prompt-message');
       let storageStatusRequestId = 0;
+      let promptRecords = [];
+      let notebookLMPromptRecords = [];
       const homeDate = document.querySelector('#home-date');
       const homeSummaryError = document.querySelector('#home-summary-error');
       const homeListError = document.querySelector('#home-list-error');
@@ -609,7 +1026,49 @@
       const inspectionDetailError = document.querySelector('#inspection-detail-error');
       const detailPanel = document.querySelector('#detail-panel');
       const detailPhotoMeasurement = document.querySelector('#detail-photo-measurement');
-      const detailPlaceholder = document.querySelector('#detail-placeholder');
+      const detailGeminiResult = document.querySelector('#detail-gemini-result');
+      const detailGeminiBadge = document.querySelector('#detail-gemini-badge');
+      const detailGeminiRevision = document.querySelector('#detail-gemini-revision');
+      const detailGeminiPrompt = document.querySelector('#detail-gemini-prompt');
+      const detailGeminiRequest = document.querySelector('#detail-gemini-request');
+      const detailGeminiRequestError = document.querySelector('#detail-gemini-request-error');
+      const detailGeminiState = document.querySelector('#detail-gemini-state');
+      const detailGeminiStale = document.querySelector('#detail-gemini-stale');
+      const detailGeminiFields = document.querySelector('#detail-gemini-fields');
+      const detailGeminiComparison = document.querySelector('#detail-gemini-comparison');
+      const detailGeminiCompareLeft = document.querySelector('#detail-gemini-compare-left');
+      const detailGeminiCompareRight = document.querySelector('#detail-gemini-compare-right');
+      const detailGeminiComparisonOutput = document.querySelector('#detail-gemini-comparison-output');
+      const detailEvidenceReference = document.querySelector('#detail-evidence-reference');
+      const detailStandardSource = document.querySelector('#detail-standard-source');
+      const detailStandardSummary = document.querySelector('#detail-standard-summary');
+      const detailStandardText = document.querySelector('#detail-standard-text');
+      const detailEvidencePrompt = document.querySelector('#detail-evidence-prompt');
+      const detailEvidenceRequest = document.querySelector('#detail-evidence-request');
+      const detailEvidenceGuidance = document.querySelector('#detail-evidence-guidance');
+      const detailEvidenceAnswer = document.querySelector('#detail-evidence-answer');
+      const detailEvidenceMock = document.querySelector('#detail-evidence-mock');
+      const detailEvidenceAnswerText = document.querySelector('#detail-evidence-answer-text');
+      const detailEvidenceSources = document.querySelector('#detail-evidence-sources');
+      const detailEvidenceSentQuestion = document.querySelector('#detail-evidence-sent-question');
+      const detailEvidenceSentQuestionText = document.querySelector('#detail-evidence-sent-question-text');
+      const detailEvidencePromptUsed = document.querySelector('#detail-evidence-prompt-used');
+      const detailEvidenceReview = document.querySelector('#detail-evidence-review');
+      const detailEvidenceReadMatch = document.querySelector('#detail-evidence-read-match');
+      const detailEvidenceReviewNeeded = document.querySelector('#detail-evidence-review-needed');
+      const detailEvidenceReviewMemo = document.querySelector('#detail-evidence-review-memo');
+      const detailEvidenceReviewSave = document.querySelector('#detail-evidence-review-save');
+      const detailEvidenceReviewError = document.querySelector('#detail-evidence-review-error');
+      const detailJudgment = document.querySelector('#detail-judgment');
+      const detailJudgmentMemo = document.querySelector('#detail-judgment-memo');
+      const detailJudgmentChangeReason = document.querySelector('#detail-judgment-change-reason');
+      const detailJudgmentSave = document.querySelector('#detail-judgment-save');
+      const detailJudgmentSaveError = document.querySelector('#detail-judgment-save-error');
+      const detailRecordHistory = document.querySelector('#detail-record-history');
+      const detailRecordHistoryList = document.querySelector('#detail-record-history-list');
+      const detailRecordHistoryError = document.querySelector('#detail-record-history-error');
+      const judgmentDecisionButtons = [...document.querySelectorAll('[data-judgment]')];
+      const judgmentDefectButtons = [...document.querySelectorAll('[data-defect]')];
       const detailMainImage = document.querySelector('#detail-main-image');
       const detailThumbnails = document.querySelector('#detail-thumbnails');
       const detailEditForm = document.querySelector('#detail-edit-form');
@@ -629,6 +1088,21 @@
       let selectedImageDataUrls = [];
       let imageSelectionVersion = 0;
       let activeDetailImages = [];
+      let activeDetailInspectionId = '';
+      let activeDetailRevision = 'Rev.A';
+      let detailRecordHistoryRequestId = 0;
+      let selectedJudgment = null;
+      const selectedDefects = new Set();
+      let detailPromptRecords = [];
+      let detailPromptOptionsInspectionId = '';
+      let detailPromptOptionsRequestId = 0;
+      let detailGeminiOptionsReady = false;
+      let detailGeminiComparisonResultIds = '';
+      let geminiResultRequestId = 0;
+      let evidenceReferenceRequestId = 0;
+      let evidencePromptRecords = [];
+      let evidenceLinkSaved = false;
+      let geminiPollTimer = null;
 
       function readImageAsDataUrl(file) {
         return new Promise((resolve, reject) => {
@@ -695,7 +1169,18 @@
           if (!response.ok || result.error) {
             throw new Error(result.error || '검사를 등록하지 못했습니다.');
           }
-          navigate(`/inspections/${encodeURIComponent(result.inspection_id)}`);
+          const inspectionRoute = `/inspections/${encodeURIComponent(result.inspection_id)}`;
+          try {
+            const geminiResponse = await fetch(`/api/inspections/${encodeURIComponent(result.inspection_id)}/gemini`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ revision: result.revision, prompt: 'v3' }),
+            });
+            await geminiResponse.json();
+          } catch {
+            // 판독 시작에 실패해도 이미 등록한 검사는 유지하고 상세 화면으로 이동합니다.
+          }
+          navigate(`${inspectionRoute}?tab=2`);
         } catch (error) {
           inspectionSubmitError.textContent = error.message || '검사를 등록하지 못했습니다.';
           inspectionSubmitError.hidden = false;
@@ -750,7 +1235,6 @@
       async function loadStorageStatus() {
         const requestId = ++storageStatusRequestId;
         storageStatus.textContent = '저장소 상태를 불러오는 중입니다.';
-        geminiStatus.textContent = 'Gemini 판독 상태를 불러오는 중입니다.';
         try {
           const response = await fetch('/api/operations');
           const result = await response.json();
@@ -764,6 +1248,120 @@
           geminiStatus.textContent = error.message || 'Gemini 판독 상태를 불러오지 못했습니다.';
         }
       }
+
+      async function loadPrompts(selectedName) {
+        promptMessage.textContent = '';
+        try {
+          const response = await fetch('/api/prompts');
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Gemini 지시문을 불러오지 못했습니다.');
+          if (window.location.pathname !== '/settings') return;
+          promptRecords = result.prompts;
+          promptVersion.replaceChildren(...promptRecords.map((prompt) => {
+            const option = document.createElement('option');
+            option.value = prompt.name;
+            option.textContent = prompt.name;
+            return option;
+          }));
+          promptVersion.value = selectedName || result.default;
+          showSelectedPrompt();
+          promptVersion.disabled = false;
+          promptText.disabled = false;
+          savePromptButton.disabled = false;
+        } catch (error) {
+          promptMessage.textContent = error.message || 'Gemini 지시문을 불러오지 못했습니다.';
+        }
+      }
+
+      function showSelectedPrompt() {
+        const selected = promptRecords.find((prompt) => prompt.name === promptVersion.value);
+        promptText.value = selected?.text || '';
+      }
+
+      promptVersion.addEventListener('change', showSelectedPrompt);
+
+      savePromptButton.addEventListener('click', async () => {
+        const selected = promptRecords.find((prompt) => prompt.name === promptVersion.value);
+        const base = selected?.name.match(/^v[1-3]/)?.[0];
+        if (!base) {
+          promptMessage.textContent = '저장할 지시문 버전을 확인하세요.';
+          return;
+        }
+        savePromptButton.disabled = true;
+        promptMessage.textContent = '수정본을 저장하고 있습니다.';
+        try {
+          const response = await fetch('/api/prompts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base, text: promptText.value }),
+          });
+          const saved = await response.json();
+          if (!response.ok) throw new Error(saved.error || '수정본을 저장하지 못했습니다.');
+          await loadPrompts(saved.name);
+          promptMessage.textContent = '수정본을 저장했습니다.';
+        } catch (error) {
+          promptMessage.textContent = error.message || '수정본을 저장하지 못했습니다.';
+        } finally {
+          savePromptButton.disabled = false;
+        }
+      });
+
+      async function loadNotebookLMPrompts(selectedName) {
+        notebookLMPromptMessage.textContent = '';
+        try {
+          const response = await fetch('/api/prompts?kind=notebooklm');
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'NotebookLM 근거 질문을 불러오지 못했습니다.');
+          if (window.location.pathname !== '/settings') return;
+          notebookLMPromptRecords = result.prompts;
+          notebookLMPromptVersion.replaceChildren(...notebookLMPromptRecords.map((prompt) => {
+            const option = document.createElement('option');
+            option.value = prompt.name;
+            option.textContent = prompt.name;
+            return option;
+          }));
+          notebookLMPromptVersion.value = selectedName || result.default;
+          showSelectedNotebookLMPrompt();
+          notebookLMPromptVersion.disabled = false;
+          notebookLMPromptText.disabled = false;
+          saveNotebookLMPromptButton.disabled = false;
+        } catch (error) {
+          notebookLMPromptMessage.textContent = error.message || 'NotebookLM 근거 질문을 불러오지 못했습니다.';
+        }
+      }
+
+      function showSelectedNotebookLMPrompt() {
+        const selected = notebookLMPromptRecords.find((prompt) => prompt.name === notebookLMPromptVersion.value);
+        notebookLMPromptText.value = selected?.text || '';
+      }
+
+      notebookLMPromptVersion.addEventListener('change', showSelectedNotebookLMPrompt);
+
+      saveNotebookLMPromptButton.addEventListener('click', async () => {
+        const selected = notebookLMPromptRecords.find((prompt) => prompt.name === notebookLMPromptVersion.value);
+        const base = selected?.name.match(/^v[1-3]/)?.[0];
+        if (!base) {
+          notebookLMPromptMessage.textContent = '저장할 근거 질문 버전을 확인하세요.';
+          return;
+        }
+        saveNotebookLMPromptButton.disabled = true;
+        notebookLMPromptMessage.textContent = '수정본을 저장하고 있습니다.';
+        try {
+          const response = await fetch('/api/prompts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base, text: notebookLMPromptText.value, kind: 'notebooklm' }),
+          });
+          const saved = await response.json();
+          if (!response.ok) throw new Error(saved.error || '근거 질문 수정본을 저장하지 못했습니다.');
+          await loadNotebookLMPrompts(saved.name);
+          notebookLMPromptMessage.textContent = '수정본을 저장했습니다.';
+        } catch (error) {
+          notebookLMPromptMessage.textContent = error.message || '근거 질문 수정본을 저장하지 못했습니다.';
+        } finally {
+          saveNotebookLMPromptButton.disabled = false;
+        }
+      });
 
       async function loadHomeInspections() {
         const requestId = ++homeListRequestId;
@@ -880,6 +1478,9 @@
       }
 
       async function loadInspectionDetail(route) {
+        geminiResultRequestId += 1;
+        clearTimeout(geminiPollTimer);
+        geminiPollTimer = null;
         inspectionDetailContent.hidden = true;
         inspectionDetailError.hidden = true;
         try {
@@ -887,6 +1488,17 @@
           const inspection = await response.json();
           if (!response.ok) throw new Error(inspection.error || '검사를 불러오지 못했습니다.');
           if (window.location.pathname !== route) return;
+          activeDetailInspectionId = inspection.inspection_id;
+          activeDetailRevision = inspection.revision;
+          void loadInspectionRecordHistory(inspection.inspection_id);
+          if (detailPromptOptionsInspectionId !== inspection.inspection_id) {
+            detailPromptOptionsInspectionId = inspection.inspection_id;
+            detailGeminiOptionsReady = false;
+            detailGeminiRevision.disabled = true;
+            detailGeminiPrompt.disabled = true;
+            detailGeminiRequest.disabled = true;
+            void loadDetailPromptOptions(inspection.inspection_id);
+          }
 
           const productNames = {
             'P-SILVER': '텀블러 실버',
@@ -903,12 +1515,17 @@
           document.querySelector('#detail-value-revision').textContent = inspection.revision;
           document.querySelector('#detail-value-weight').textContent = inspection.weight_g === null ? '미측정' : `${inspection.weight_g}g`;
           document.querySelector('#detail-value-memo').textContent = inspection.memo || '없음';
+          detailJudgmentMemo.value = inspection.memo || '';
+          detailJudgmentChangeReason.value = '담당자 대조 판정 기록';
+          detailJudgmentSaveError.hidden = true;
           populateDetailProductOptions(inspection.product_id);
           document.querySelector('#detail-edit-date').value = inspection.inspected_at.replace(' ', 'T');
           document.querySelector('#detail-edit-weight').value = inspection.weight_g ?? '';
           detailEditError.hidden = true;
           renderDetailImages(Array.isArray(inspection.images) ? inspection.images : []);
-          selectDetailTab(0);
+          renderJudgmentSelection(inspection);
+          const requestedTab = new URLSearchParams(window.location.search).get('tab');
+          selectDetailTab(requestedTab === '2' ? 1 : requestedTab === '4' ? 3 : 0, false);
           inspectionDetailContent.hidden = false;
         } catch (error) {
           if (window.location.pathname !== route) return;
@@ -917,14 +1534,471 @@
         }
       }
 
-      function selectDetailTab(index) {
+      function selectDetailTab(index, updateAddress = true) {
         detailTabs.forEach((tab, tabIndex) => {
           tab.setAttribute('aria-selected', String(tabIndex === index));
         });
         detailPanel.setAttribute('aria-labelledby', detailTabs[index].id);
         detailPhotoMeasurement.hidden = index !== 0;
-        detailPlaceholder.hidden = index === 0;
-        detailPlaceholder.textContent = index === 0 ? '' : '이 탭은 나중 회차에서 만듭니다.';
+        detailGeminiResult.hidden = index !== 1;
+        detailEvidenceReference.hidden = index !== 2;
+        detailJudgment.hidden = index !== 3;
+        if (index === 1 && activeDetailInspectionId) {
+          void loadGeminiResult(activeDetailInspectionId);
+        } else if (index === 2 && activeDetailInspectionId) {
+          void loadEvidenceReference(activeDetailInspectionId);
+        } else {
+          geminiResultRequestId += 1;
+          clearTimeout(geminiPollTimer);
+          geminiPollTimer = null;
+        }
+        if (updateAddress) {
+          const query = new URLSearchParams(window.location.search);
+          if (index === 1) query.set('tab', '2');
+          else if (index === 3) query.set('tab', '4');
+          else query.delete('tab');
+          const search = query.toString();
+          history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
+        }
+      }
+
+      async function loadInspectionRecordHistory(inspectionId) {
+        const requestId = ++detailRecordHistoryRequestId;
+        detailRecordHistory.open = false;
+        detailRecordHistoryList.replaceChildren();
+        detailRecordHistoryError.hidden = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/records`);
+          const records = await response.json();
+          if (!response.ok) throw new Error(records.error || '변경 이력을 불러오지 못했습니다.');
+          if (requestId !== detailRecordHistoryRequestId || activeDetailInspectionId !== inspectionId) return;
+          records.forEach((record) => {
+            const item = document.createElement('li');
+            const weight = record.weight_g === null ? '미측정' : `${record.weight_g}g`;
+            item.textContent = `${record.recorded_at} · 기록 버전 ${record.content_version} · 판정 ${record.decision} · 중량 ${weight} · 저장한 사람 ${record.user_id} · 변경 사유 ${record.change_reason}`;
+            detailRecordHistoryList.append(item);
+          });
+        } catch (error) {
+          if (requestId !== detailRecordHistoryRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailRecordHistoryError.textContent = error.message || '변경 이력을 불러오지 못했습니다.';
+          detailRecordHistoryError.hidden = false;
+          detailRecordHistory.open = true;
+        }
+      }
+
+      async function loadEvidenceReference(inspectionId) {
+        const requestId = ++evidenceReferenceRequestId;
+        detailStandardSource.open = false;
+        detailStandardText.textContent = '검사기준 원문을 불러오는 중입니다.';
+        detailStandardSummary.textContent = '검사기준 원문 읽기 · 불러오는 중';
+        detailEvidenceRequest.disabled = false;
+        detailEvidenceGuidance.textContent = '';
+        detailEvidenceAnswer.hidden = true;
+        try {
+          const statusResponse = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/evidence`);
+          const status = await statusResponse.json();
+          if (!statusResponse.ok) throw new Error('서버에서 오류가 발생했습니다.');
+          if (requestId !== evidenceReferenceRequestId || activeDetailInspectionId !== inspectionId) return;
+          const revision = status.revision;
+          detailStandardSummary.textContent = `검사기준 원문 읽기 · ${revision}`;
+          const textResponse = await fetch(`/api/standards/${encodeURIComponent(revision)}/text`);
+          const standard = await textResponse.json();
+          if (!textResponse.ok) throw new Error(standard.error || '서버에서 오류가 발생했습니다.');
+          if (requestId !== evidenceReferenceRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailStandardText.textContent = standard.text;
+          await loadEvidencePrompts(inspectionId, status.query?.prompt_name || 'v3');
+          if (requestId !== evidenceReferenceRequestId || activeDetailInspectionId !== inspectionId) return;
+          if (status.query) renderEvidenceAnswer(status.query, status.link);
+          if (status.mode === 'off') {
+            detailEvidenceRequest.disabled = true;
+            detailEvidenceGuidance.textContent = 'NotebookLM 근거 대조가 꺼져 있습니다(NOTEBOOKLM_MODE=off). 기준 원문을 직접 읽고 판단하세요.';
+          } else if (!status.has_result) {
+            detailEvidenceRequest.disabled = true;
+            detailEvidenceGuidance.textContent = '2번 탭에서 판독 결과를 먼저 준비하세요. 결과가 생기면 근거를 볼 수 있습니다.';
+          } else if (status.stale) {
+            detailEvidenceRequest.disabled = true;
+            detailEvidenceGuidance.textContent = '2번 탭에서 다시 판독해 주세요. 이전 결과로는 근거를 확인할 수 없습니다.';
+          }
+        } catch (error) {
+          if (requestId !== evidenceReferenceRequestId) return;
+          detailStandardText.textContent = error.message || '서버에서 오류가 발생했습니다.';
+          detailEvidenceGuidance.textContent = error.message || '서버에서 오류가 발생했습니다.';
+        }
+      }
+
+      function renderEvidenceAnswer(query, link = null) {
+        detailEvidenceAnswerText.textContent = query.answer || '';
+        const sourceCount = Array.isArray(query.sources) ? query.sources.length : 0;
+        detailEvidenceSources.textContent = `인용한 소스 ${sourceCount}개`;
+        detailEvidenceMock.hidden = query.mode !== 'mock';
+        detailEvidenceSentQuestionText.textContent = query.question || '';
+        const prompt = evidencePromptRecords.find((item) => item.name === query.prompt_name);
+        const base = query.prompt_name?.match(/^v[1-3]/)?.[0] || 'v3';
+        detailEvidencePromptUsed.textContent = prompt?.custom
+          ? `사용한 근거 질문: ${base} · 저장한 수정본`
+          : `사용한 근거 질문: ${base} · 기본 원문`;
+        detailEvidenceSentQuestion.hidden = false;
+        detailEvidenceSentQuestion.open = false;
+        detailEvidenceReview.hidden = false;
+        detailEvidenceReviewError.hidden = true;
+        detailEvidenceReadMatch.checked = false;
+        detailEvidenceReviewNeeded.checked = false;
+        detailEvidenceReviewMemo.value = '';
+        evidenceLinkSaved = false;
+        detailEvidenceReviewSave.textContent = '출처 대조 기록 저장';
+        if (link?.query_id === query.query_id) {
+          const reviewNeeded = link.status === 'REVIEW_NEEDED_BY_USER' || link.status === 'MOCK_REVIEW_NEEDED';
+          detailEvidenceReadMatch.checked = true;
+          detailEvidenceReviewNeeded.checked = reviewNeeded;
+          detailEvidenceReviewMemo.value = link.memo || '';
+          evidenceLinkSaved = true;
+          detailEvidenceReviewSave.textContent = '기준 확인 기록 저장됨';
+        }
+        detailEvidenceReadMatch.disabled = evidenceLinkSaved;
+        detailEvidenceReviewNeeded.disabled = evidenceLinkSaved;
+        detailEvidenceReviewMemo.disabled = evidenceLinkSaved;
+        detailEvidenceReviewSave.disabled = evidenceLinkSaved || !detailEvidenceReadMatch.checked;
+        detailEvidenceAnswer.hidden = false;
+      }
+
+      function updateEvidenceReviewSaveButton() {
+        detailEvidenceReviewSave.disabled = evidenceLinkSaved || !detailEvidenceReadMatch.checked;
+      }
+
+      async function saveEvidenceReview() {
+        if (!activeDetailInspectionId || evidenceLinkSaved) return;
+        detailEvidenceReviewError.hidden = true;
+        detailEvidenceReviewSave.disabled = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(activeDetailInspectionId)}/evidence-link`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              verdict: detailEvidenceReviewNeeded.checked ? 'review' : 'match',
+              memo: detailEvidenceReviewMemo.value,
+            }),
+          });
+          const link = await response.json();
+          if (!response.ok) throw new Error(link.error || '출처 대조 기록을 저장하지 못했습니다.');
+          evidenceLinkSaved = true;
+          detailEvidenceReviewSave.textContent = '기준 확인 기록 저장됨';
+          detailEvidenceReadMatch.disabled = true;
+          detailEvidenceReviewNeeded.disabled = true;
+          detailEvidenceReviewMemo.disabled = true;
+          detailEvidenceReviewSave.disabled = true;
+          try {
+            await refreshGeminiBadge(activeDetailInspectionId);
+          } catch {
+            // The saved comparison remains successful even if the badge refresh fails.
+          }
+        } catch (error) {
+          detailEvidenceReviewError.textContent = error.message || '출처 대조 기록을 저장하지 못했습니다.';
+          detailEvidenceReviewError.hidden = false;
+          updateEvidenceReviewSaveButton();
+        }
+      }
+
+      async function refreshGeminiBadge(inspectionId) {
+        const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/gemini`);
+        const status = await response.json();
+        if (response.ok && activeDetailInspectionId === inspectionId) updateGeminiBadge(status);
+      }
+
+      async function loadEvidencePrompts(inspectionId, selectedName = 'v3') {
+        const response = await fetch('/api/prompts?kind=notebooklm');
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '근거 질문을 불러오지 못했습니다.');
+        if (activeDetailInspectionId !== inspectionId) return;
+        evidencePromptRecords = result.prompts;
+        detailEvidencePrompt.replaceChildren(...evidencePromptRecords.map((prompt) => {
+          const option = document.createElement('option');
+          option.value = prompt.name;
+          option.textContent = prompt.name;
+          return option;
+        }));
+        detailEvidencePrompt.value = evidencePromptRecords.some((prompt) => prompt.name === selectedName)
+          ? selectedName
+          : result.default || 'v3';
+      }
+
+      async function askForEvidence(inspectionId) {
+        detailEvidenceRequest.disabled = true;
+        detailEvidenceGuidance.textContent = '';
+        detailEvidenceAnswerText.textContent = 'NotebookLM에서 검사기준을 찾는 중입니다.';
+        detailEvidenceMock.hidden = true;
+        detailEvidenceSources.textContent = '';
+        detailEvidenceAnswer.hidden = false;
+        detailEvidenceSentQuestion.hidden = true;
+        detailEvidenceReview.hidden = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/evidence`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: detailEvidencePrompt.value || 'v3' }),
+          });
+          const query = await response.json();
+          if (!response.ok) throw new Error(query.error || '근거 확인에 실패했습니다.');
+          if (activeDetailInspectionId !== inspectionId) return;
+          if (!evidencePromptRecords.some((prompt) => prompt.name === query.prompt_name)) {
+            await loadEvidencePrompts(inspectionId, query.prompt_name || 'v3');
+          }
+          if (activeDetailInspectionId !== inspectionId) return;
+          renderEvidenceAnswer(query);
+          detailEvidenceRequest.disabled = false;
+        } catch (error) {
+          detailEvidenceAnswer.hidden = true;
+          detailEvidenceGuidance.textContent = `근거 확인 실패: ${error.message || '서버에서 오류가 발생했습니다.'}`;
+          detailEvidenceRequest.disabled = false;
+        }
+      }
+
+      async function loadGeminiResult(inspectionId) {
+        const requestId = ++geminiResultRequestId;
+        clearTimeout(geminiPollTimer);
+        geminiPollTimer = null;
+        detailGeminiFields.replaceChildren();
+        detailGeminiStale.hidden = true;
+        detailGeminiBadge.hidden = true;
+        detailGeminiState.textContent = '판독 상태를 불러오는 중입니다.';
+        detailGeminiState.hidden = false;
+
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(inspectionId)}/gemini`);
+          const status = await response.json();
+          if (!response.ok) throw new Error(status.error || '판독 결과를 불러오지 못했습니다.');
+          if (
+            requestId !== geminiResultRequestId ||
+            activeDetailInspectionId !== inspectionId ||
+            detailTabs[1].getAttribute('aria-selected') !== 'true'
+          ) return;
+
+          if (status.state === 'running') {
+            detailGeminiState.textContent = '판독 중';
+            detailGeminiState.hidden = false;
+            geminiPollTimer = setTimeout(() => void loadGeminiResult(inspectionId), 3000);
+          } else if (status.state === 'failed') {
+            detailGeminiState.textContent = `판독 실패: ${status.error || '판독하지 못했습니다.'}`;
+            detailGeminiState.hidden = false;
+          } else {
+            detailGeminiState.hidden = true;
+          }
+
+          const hasResults = Array.isArray(status.results) && status.results.length > 0;
+          renderGeminiComparison(status.results || []);
+          detailGeminiRequest.textContent = hasResults ? 'AI 재판독 요청' : 'AI 판독 요청';
+          detailGeminiRequest.disabled = status.state === 'running' || !detailGeminiOptionsReady;
+          updateGeminiBadge(status);
+
+          detailGeminiStale.hidden = !status.stale;
+          const latest = status.results?.[0];
+          if (!latest) {
+            const empty = document.createElement('p');
+            empty.className = 'gemini-result-message';
+            empty.textContent = '아직 판독한 결과가 없습니다.';
+            detailGeminiFields.append(empty);
+            return;
+          }
+
+          const labels = [
+            ['판정', latest.result['판정']],
+            ['불량유형', latest.result['불량유형']],
+            ['관찰·수치 근거', latest.result['관찰·수치 근거']],
+            ['적용 기준과 출처', latest.result['적용 기준과 출처']],
+            ['권고 조치', latest.result['권고 조치']],
+            ['사람 승인 필요 여부', latest.result['사람 승인 필요 여부']],
+          ];
+          const fields = document.createElement('dl');
+          fields.className = 'gemini-result-fields';
+          labels.forEach(([label, value], index) => {
+            const row = document.createElement('div');
+            if (index === 0) row.classList.add('gemini-decision');
+            const term = document.createElement('dt');
+            term.textContent = label;
+            const description = document.createElement('dd');
+            description.textContent = label === '판정'
+              ? ({ OK: '정상', NG: '불량', HOLD: '보류' }[value] || value)
+              : value;
+            row.append(term, description);
+            fields.append(row);
+          });
+          detailGeminiFields.replaceChildren(fields);
+        } catch (error) {
+          if (requestId !== geminiResultRequestId) return;
+          detailGeminiRequest.disabled = false;
+          detailGeminiState.textContent = error.message || '판독 결과를 불러오지 못했습니다.';
+          detailGeminiState.hidden = false;
+        }
+      }
+
+      function updateGeminiBadge(status) {
+        const hasResults = Array.isArray(status.results) && status.results.length > 0;
+        const reviewNeeded = status.link?.status === 'REVIEW_NEEDED_BY_USER' || status.link?.status === 'MOCK_REVIEW_NEEDED';
+        const badge = status.state === 'running'
+          ? '판독 중'
+          : status.state === 'failed'
+            ? '판독 실패'
+            : !hasResults
+              ? '결과 없음'
+              : status.stale
+                ? '다시 판독 필요'
+                : reviewNeeded
+                  ? '검토 필요'
+                  : '확인할 결과';
+        detailGeminiBadge.textContent = badge;
+        detailGeminiBadge.classList.toggle('review-needed', badge === '검토 필요');
+        detailGeminiBadge.hidden = false;
+      }
+
+      async function loadDetailPromptOptions(inspectionId) {
+        const requestId = ++detailPromptOptionsRequestId;
+        try {
+          const response = await fetch('/api/prompts');
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Gemini 지시문을 불러오지 못했습니다.');
+          if (requestId !== detailPromptOptionsRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailPromptRecords = result.prompts;
+          detailGeminiPrompt.replaceChildren(...detailPromptRecords.map((prompt) => {
+            const option = document.createElement('option');
+            option.value = prompt.name;
+            option.textContent = prompt.name;
+            return option;
+          }));
+          detailGeminiRevision.value = activeDetailRevision;
+          detailGeminiPrompt.value = result.default || 'v3';
+          detailGeminiRevision.disabled = false;
+          detailGeminiPrompt.disabled = false;
+          detailGeminiOptionsReady = true;
+          detailGeminiRequest.disabled = detailGeminiBadge.textContent === '판독 중';
+        } catch (error) {
+          if (requestId !== detailPromptOptionsRequestId || activeDetailInspectionId !== inspectionId) return;
+          detailGeminiRequestError.textContent = error.message || 'Gemini 지시문을 불러오지 못했습니다.';
+          detailGeminiRequestError.hidden = false;
+        }
+      }
+
+      detailGeminiRequest.addEventListener('click', async () => {
+        if (!activeDetailInspectionId || !detailGeminiOptionsReady) return;
+        detailGeminiRequestError.hidden = true;
+        detailGeminiRequest.disabled = true;
+        try {
+          const response = await fetch(`/api/inspections/${encodeURIComponent(activeDetailInspectionId)}/gemini`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ revision: detailGeminiRevision.value, prompt: detailGeminiPrompt.value }),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || '판독을 시작하지 못했습니다.');
+          await loadGeminiResult(activeDetailInspectionId);
+        } catch (error) {
+          detailGeminiRequestError.textContent = error.message || '판독을 시작하지 못했습니다.';
+          detailGeminiRequestError.hidden = false;
+        } finally {
+          if (!geminiPollTimer) detailGeminiRequest.disabled = false;
+        }
+      });
+
+      detailGeminiCompareLeft.addEventListener('change', () => {
+        if (detailGeminiCompareLeft.value === detailGeminiCompareRight.value) {
+          const other = [...detailGeminiCompareRight.options].find((option) => option.value !== detailGeminiCompareLeft.value);
+          if (other) detailGeminiCompareRight.value = other.value;
+        }
+        renderGeminiComparisonTable();
+      });
+
+      detailGeminiCompareRight.addEventListener('change', () => {
+        if (detailGeminiCompareRight.value === detailGeminiCompareLeft.value) {
+          const other = [...detailGeminiCompareLeft.options].find((option) => option.value !== detailGeminiCompareRight.value);
+          if (other) detailGeminiCompareLeft.value = other.value;
+        }
+        renderGeminiComparisonTable();
+      });
+
+      let detailGeminiComparisonResults = [];
+
+      function renderGeminiComparison(results) {
+        if (!Array.isArray(results) || results.length < 2) {
+          detailGeminiComparison.hidden = true;
+          detailGeminiComparisonResults = [];
+          detailGeminiComparisonResultIds = '';
+          detailGeminiCompareLeft.replaceChildren();
+          detailGeminiCompareRight.replaceChildren();
+          detailGeminiComparisonOutput.replaceChildren();
+          return;
+        }
+
+        const resultIds = results.map((record) => record.result_id).join('|');
+        const unchangedSelection = resultIds === detailGeminiComparisonResultIds;
+        const previousLeft = unchangedSelection ? detailGeminiCompareLeft.value : results[0].result_id;
+        const previousRight = unchangedSelection ? detailGeminiCompareRight.value : results[1].result_id;
+        detailGeminiComparisonResultIds = resultIds;
+        detailGeminiComparisonResults = results;
+        const options = results.map((record) => {
+          const option = document.createElement('option');
+          option.value = record.result_id;
+          option.textContent = `${record.instruction_name} · ${record.created_at}`;
+          return option;
+        });
+        detailGeminiCompareLeft.replaceChildren(...options.map((option) => option.cloneNode(true)));
+        detailGeminiCompareRight.replaceChildren(...options.map((option) => option.cloneNode(true)));
+        detailGeminiCompareLeft.value = results.some((record) => record.result_id === previousLeft)
+          ? previousLeft
+          : results[0].result_id;
+        detailGeminiCompareRight.value = results.some((record) => record.result_id === previousRight)
+          ? previousRight
+          : results[1].result_id;
+        if (detailGeminiCompareLeft.value === detailGeminiCompareRight.value) {
+          detailGeminiCompareRight.value = results.find((record) => record.result_id !== detailGeminiCompareLeft.value).result_id;
+        }
+        detailGeminiComparison.hidden = false;
+        renderGeminiComparisonTable();
+      }
+
+      function renderGeminiComparisonTable() {
+        const left = detailGeminiComparisonResults.find((record) => record.result_id === detailGeminiCompareLeft.value);
+        const right = detailGeminiComparisonResults.find((record) => record.result_id === detailGeminiCompareRight.value);
+        if (!left || !right) return;
+
+        const table = document.createElement('table');
+        table.className = 'gemini-comparison-table';
+        const head = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        const blankHeader = document.createElement('th');
+        blankHeader.scope = 'col';
+        headerRow.append(blankHeader);
+        [left, right].forEach((record) => {
+          const header = document.createElement('th');
+          header.scope = 'col';
+          header.textContent = `${record.instruction_name} · ${record.created_at}`;
+          headerRow.append(header);
+        });
+        head.append(headerRow);
+        const body = document.createElement('tbody');
+        const fields = [
+          ['판정', '판정'],
+          ['불량유형', '불량유형'],
+          ['관찰·수치 근거', '관찰·수치 근거'],
+          ['적용 기준과 출처', '적용 기준과 출처'],
+          ['권고 조치', '권고 조치'],
+          ['사람 승인 필요 여부', '사람 승인 필요 여부'],
+        ];
+        fields.forEach(([label, key]) => {
+          const row = document.createElement('tr');
+          const heading = document.createElement('th');
+          heading.scope = 'row';
+          heading.textContent = label;
+          row.append(heading);
+          [left, right].forEach((record) => {
+            const cell = document.createElement('td');
+            const value = record.result[key];
+            cell.textContent = key === '판정'
+              ? ({ OK: '정상', NG: '불량', HOLD: '보류' }[value] || value)
+              : value;
+            row.append(cell);
+          });
+          body.append(row);
+        });
+        table.append(head, body);
+        detailGeminiComparisonOutput.replaceChildren(table);
       }
 
       function populateDetailProductOptions(selectedProductId) {
@@ -1019,6 +2093,15 @@
         newInspectionLink.hidden = true;
         let title = '품질 현황';
         const isDetail = /^\/inspections\/[^/]+$/.test(route);
+        if (!isDetail) {
+          geminiResultRequestId += 1;
+          detailPromptOptionsRequestId += 1;
+          clearTimeout(geminiPollTimer);
+          geminiPollTimer = null;
+          activeDetailInspectionId = '';
+          detailPromptOptionsInspectionId = '';
+          detailGeminiOptionsReady = false;
+        }
         if (route === '/inspections/new') title = '검사 등록';
         else if (isDetail) title = '검사 상세';
         else if (route === '/settings') title = '설정';
@@ -1039,12 +2122,89 @@
         inspectionDetailView.hidden = !isDetail;
         notFoundView.hidden = true;
         if (isHome) loadHomeSummary();
-        if (isSettings) loadStorageStatus();
+        if (isSettings) {
+          loadStorageStatus();
+          loadPrompts();
+          loadNotebookLMPrompts();
+        }
         if (isNewInspection) loadInspectionFields();
         if (isDetail) loadInspectionDetail(route);
       }
 
       detailTabs.forEach((tab, index) => tab.addEventListener('click', () => selectDetailTab(index)));
+
+      function renderJudgmentSelection(inspection) {
+        selectedJudgment = ['OK', 'NG', 'HOLD'].includes(inspection.decision) ? inspection.decision : null;
+        selectedDefects.clear();
+        (Array.isArray(inspection.defects) ? inspection.defects : []).forEach((defect) => {
+          if (defect?.defect_code) selectedDefects.add(defect.defect_code);
+        });
+        updateJudgmentButtonStates();
+      }
+
+      function updateJudgmentButtonStates() {
+        judgmentDecisionButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.judgment === selectedJudgment));
+        });
+        judgmentDefectButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(selectedDefects.has(button.dataset.defect)));
+        });
+      }
+
+      judgmentDecisionButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          selectedJudgment = button.dataset.judgment;
+          updateJudgmentButtonStates();
+        });
+      });
+
+      judgmentDefectButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const defectCode = button.dataset.defect;
+          if (selectedDefects.has(defectCode)) selectedDefects.delete(defectCode);
+          else selectedDefects.add(defectCode);
+          updateJudgmentButtonStates();
+        });
+      });
+
+      detailJudgmentSave.addEventListener('click', () => void saveInspectionJudgment());
+
+      async function saveInspectionJudgment() {
+        if (!activeDetailInspectionId) return;
+        const inspectionId = activeDetailInspectionId;
+        detailJudgmentSave.disabled = true;
+        detailJudgmentSaveError.hidden = true;
+        try {
+          const response = await fetch(
+            `/api/inspections/${encodeURIComponent(inspectionId)}/records`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                decision: selectedJudgment,
+                defects: [...selectedDefects],
+                memo: detailJudgmentMemo.value,
+                change_reason: detailJudgmentChangeReason.value,
+              }),
+            },
+          );
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || '판단을 저장하지 못했습니다.');
+          await loadInspectionDetail(`/inspections/${encodeURIComponent(inspectionId)}`);
+        } catch (error) {
+          detailJudgmentSaveError.textContent = error.message || '판단을 저장하지 못했습니다.';
+          detailJudgmentSaveError.hidden = false;
+        } finally {
+          detailJudgmentSave.disabled = false;
+        }
+      }
+
+      detailEvidenceRequest.addEventListener('click', () => {
+        if (activeDetailInspectionId) void askForEvidence(activeDetailInspectionId);
+      });
+      detailEvidenceReadMatch.addEventListener('change', updateEvidenceReviewSaveButton);
+      detailEvidenceReviewNeeded.addEventListener('change', updateEvidenceReviewSaveButton);
+      detailEvidenceReviewSave.addEventListener('click', () => void saveEvidenceReview());
 
       function showApp(user) {
         loginBox.hidden = true;

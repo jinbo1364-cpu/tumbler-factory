@@ -1,5 +1,5 @@
 function doGet() {
-  return ContentService.createTextOutput('\uAD8C\uD55C \uC2B9\uC778\uC774 \uB05D\uB0AC\uC2B5\uB2C8\uB2E4. \uC774 \uCC3D\uC744 \uB2EB\uACE0 \uD130\uBBF8\uB110\uB85C \uB3CC\uC544\uAC00\uC138\uC694.');
+  return ContentService.createTextOutput('권한 승인이 끝났습니다. 이 창을 닫고 터미널로 돌아가세요.');
 }
 
 function doPost(event) {
@@ -17,15 +17,21 @@ function doPost(event) {
       else if (request.action === 'getPhoto') data = getPhoto(request.id);
       else if (request.action === 'saveGeminiResult') data = saveGeminiResult(spreadsheet, request.record);
       else if (request.action === 'listGeminiResults') data = listGeminiResults(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveInspectionRecord') data = saveInspectionRecord(spreadsheet, request.record, request.defects);
+      else if (request.action === 'listInspectionRecords') data = listInspectionRecords(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveEvidenceQuery') data = saveEvidenceQuery(spreadsheet, request.record);
+      else if (request.action === 'listEvidenceQueries') data = listEvidenceQueries(spreadsheet, request.inspection_id);
+      else if (request.action === 'saveEvidenceLink') data = saveEvidenceLink(spreadsheet, request.record);
+      else if (request.action === 'listEvidenceLinks') data = listEvidenceLinks(spreadsheet, request.inspection_id);
       else if (request.action === 'runGemini') data = runGemini(request);
       else if (request.action === 'setOnePortKey') data = setOnePortKey(request.key);
-      else throw new Error('\uC9C0\uC6D0\uD558\uC9C0 \uC54A\uB294 \uC77C\uC785\uB2C8\uB2E4.');
+      else throw new Error('지원하지 않는 일입니다.');
     }
     return jsonOutput({ ok: true, data: data });
   } catch (error) {
     const message = error && error.userMessage
       ? error.userMessage
-      : '\uC54C \uC218 \uC5C6\uB294 \uC624\uB958\uAC00 \uB0AC\uC2B5\uB2C8\uB2E4.';
+      : '알 수 없는 오류가 났습니다.';
     return jsonOutput({ ok: false, error: message });
   }
 }
@@ -46,6 +52,18 @@ function setupStorage() {
     'content_version',
   ]);
   ensureSheetHeaders(spreadsheet, 'images', ['inspection_id', 'position', 'image_url']);
+  ensureSheetHeaders(spreadsheet, 'inspection_records', [
+    'record_id',
+    'inspection_id',
+    'user_id',
+    'recorded_at',
+    'decision',
+    'weight_g',
+    'notes',
+    'content_version',
+    'change_reason',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'record_defects', ['record_id', 'defect_code']);
   ensureSheetHeaders(spreadsheet, 'gemini_results', [
     'result_id',
     'inspection_id',
@@ -58,6 +76,28 @@ function setupStorage() {
     'weight_g',
     'images',
     'result',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'evidence_queries', [
+    'query_id',
+    'inspection_id',
+    'draft_id',
+    'created_at',
+    'mode',
+    'revision',
+    'prompt_name',
+    'question',
+    'answer',
+    'sources',
+  ]);
+  ensureSheetHeaders(spreadsheet, 'evidence_links', [
+    'link_id',
+    'query_id',
+    'inspection_id',
+    'draft_id',
+    'status',
+    'memo',
+    'user',
+    'created_at',
   ]);
   removeEmptyDefaultSheet(spreadsheet);
 
@@ -74,7 +114,7 @@ function getOrCreateSpreadsheet(properties) {
     }
   }
 
-  const spreadsheet = SpreadsheetApp.create('\uD140\uBE14\uB7EC \uACF5\uC7A5 \uD488\uC9C8\uAD00\uB9AC \uB370\uC774\uD130\uBCA0\uC774\uC2A4');
+  const spreadsheet = SpreadsheetApp.create('텀블러 공장 품질관리 데이터베이스');
   properties.setProperty('SHEET_ID', spreadsheet.getId());
   return spreadsheet;
 }
@@ -89,7 +129,7 @@ function getOrCreatePhotoFolder(properties) {
     }
   }
 
-  const folder = DriveApp.createFolder('\uD140\uBE14\uB7EC \uACF5\uC7A5 \uD488\uC9C8\uAC80\uC0AC \uC0AC\uC9C4');
+  const folder = DriveApp.createFolder('텀블러 공장 품질검사 사진');
   properties.setProperty('FOLDER_ID', folder.getId());
   return folder;
 }
@@ -110,7 +150,7 @@ function ensureSheetHeaders(spreadsheet, name, requiredHeaders) {
 
 function removeEmptyDefaultSheet(spreadsheet) {
   spreadsheet.getSheets().forEach((sheet) => {
-    const isDefaultSheet = sheet.getName() === 'Sheet1' || sheet.getName() === '\uC2DC\uD2B8\uD2B8';
+    const isDefaultSheet = sheet.getName() === 'Sheet1' || sheet.getName() === '시트1';
     const isEmpty = sheet.getLastRow() === 0 && sheet.getLastColumn() === 0;
     if (isDefaultSheet && isEmpty) spreadsheet.deleteSheet(sheet);
   });
@@ -121,19 +161,19 @@ function getConfiguredSpreadsheet() {
   const spreadsheetId = properties.getProperty('SHEET_ID');
   const folderId = properties.getProperty('FOLDER_ID');
   if (!spreadsheetId || !folderId) {
-    throw createUserError('\uC2DC\uD2B8\uC640 \uC0AC\uC9C4 \uD3F4\uB354\uAC00 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4. npm.cmd run gas:init\uC744 \uC2E4\uD589\uD558\uC138\uC694.');
+    throw createUserError('시트와 사진 폴더가 아직 없습니다. npm.cmd run gas:init을 실행하세요.');
   }
 
   try {
     DriveApp.getFolderById(folderId);
     return SpreadsheetApp.openById(spreadsheetId);
   } catch (error) {
-    throw createUserError('\uC2DC\uD2B8\uC640 \uC0AC\uC9C4 \uD3F4\uB354\uAC00 \uC544\uC9C1 \uC5C6\uC2B5\uB2C8\uB2E4. npm.cmd run gas:init\uC744 \uC2E4\uD589\uD558\uC138\uC694.');
+    throw createUserError('시트와 사진 폴더가 아직 없습니다. npm.cmd run gas:init을 실행하세요.');
   }
 }
 
 function readSheets(spreadsheet, tabNames) {
-  if (!Array.isArray(tabNames)) throw new Error('\uD0ED \uC774\uB984 \uBAA9\uB85D\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.');
+  if (!Array.isArray(tabNames)) throw new Error('탭 이름 목록이 필요합니다.');
   const result = {};
   tabNames.forEach((tabName) => {
     const sheet = spreadsheet.getSheetByName(tabName);
@@ -149,32 +189,30 @@ function readSheetRows(sheet) {
 
   const values = sheet.getRange(1, 1, lastRow, lastColumn).getValues();
   const headers = values[0];
-  return values.slice(1)
-    .filter((row) => row.some((value) => value !== '' && value !== null))
-    .map((row) => {
-      const item = {};
-      headers.forEach((header, index) => {
-        if (header !== '' && header !== null) item[header] = readCellValue(row[index]);
-      });
-      return item;
+  return values.slice(1).filter((row) => row.some((value) => value !== '' && value !== null)).map((row) => {
+    const item = {};
+    headers.forEach((header, index) => {
+      if (header !== '' && header !== null) item[header] = readCellValue(row[index]);
     });
+    return item;
+  });
 }
 
 function appendRows(spreadsheet, rowsByTab) {
   if (!rowsByTab || typeof rowsByTab !== 'object' || Array.isArray(rowsByTab)) {
-    throw new Error('\uB354\uD560 \uC904\uC744 \uD655\uC778\uD558\uC138\uC694.');
+    throw new Error('더할 줄을 확인하세요.');
   }
 
   let added = 0;
   Object.keys(rowsByTab).forEach((tabName) => {
     const rows = rowsByTab[tabName];
-    if (!Array.isArray(rows)) throw new Error('\uB354\uD560 \uC904\uC744 \uD655\uC778\uD558\uC138\uC694.');
+    if (!Array.isArray(rows)) throw new Error('더할 줄을 확인하세요.');
     const sheet = spreadsheet.getSheetByName(tabName);
-    if (!sheet) throw new Error('\uC2DC\uD2B8 \uD0ED\uC744 \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
+    if (!sheet) throw new Error('시트 탭을 찾을 수 없습니다.');
     if (rows.length === 0) return;
 
     const headers = getSheetHeaders(sheet);
-    if (headers.length === 0) throw new Error('\uC2DC\uD2B8 \uBA38\uB9AC\uAE00\uC744 \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
+    if (headers.length === 0) throw new Error('시트 머리글을 찾을 수 없습니다.');
     const values = rows.map((row) => headers.map((header) => toSheetValue(row[header])));
     sheet.getRange(sheet.getLastRow() + 1, 1, values.length, headers.length).setValues(values);
     added += values.length;
@@ -182,22 +220,332 @@ function appendRows(spreadsheet, rowsByTab) {
   return { added: added };
 }
 
-function updateRow(spreadsheet, request) {
-  if (!request || typeof request.tab !== 'string') {
-    throw createUserError('\uC218\uC815\uD560 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
+function saveGeminiResult(spreadsheet, record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('판독 결과를 확인하세요.');
   }
+  if (typeof record.images !== 'string' || typeof record.result !== 'string') {
+    throw createUserError('판독 결과의 사진과 항목은 JSON 글이어야 합니다.');
+  }
+  try {
+    JSON.parse(record.images);
+    JSON.parse(record.result);
+  } catch (error) {
+    throw createUserError('판독 결과의 사진과 항목을 읽을 수 없습니다.');
+  }
+
+  const appended = appendRows(spreadsheet, { gemini_results: [record] });
+  return { saved: appended.added };
+}
+
+function listGeminiResults(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+
+  const sheet = spreadsheet.getSheetByName('gemini_results');
+  if (!sheet) return { results: [] };
+
+  const rows = readSheetRows(sheet)
+    .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId)
+    .map((row) => ({
+      ...row,
+      images: parseGeminiJsonCell(row.images, []),
+      result: parseGeminiJsonCell(row.result, {}),
+    }));
+  return { results: rows };
+}
+
+function saveInspectionRecord(spreadsheet, record, defects) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('판단을 확인하세요.');
+  }
+  if (
+    typeof record.record_id !== 'string' ||
+    typeof record.inspection_id !== 'string' ||
+    typeof record.user_id !== 'string' ||
+    typeof record.recorded_at !== 'string' ||
+    !['OK', 'NG', 'HOLD'].includes(record.decision) ||
+    (record.weight_g !== null && typeof record.weight_g !== 'number') ||
+    typeof record.notes !== 'string' ||
+    typeof record.content_version !== 'number' ||
+    typeof record.change_reason !== 'string'
+  ) {
+    throw createUserError('판단을 확인하세요.');
+  }
+  if (!Array.isArray(defects) || defects.some((code) => !['D01', 'D02', 'D03', 'D04'].includes(code))) {
+    throw createUserError('불량을 확인하세요.');
+  }
+
+  const inspectionSheet = spreadsheet.getSheetByName('inspections');
+  if (!inspectionSheet) throw createUserError('검사를 찾을 수 없습니다.');
+  const inspectionRows = readSheetRows(inspectionSheet);
+  if (!inspectionRows.some((row) => row.inspection_id === record.inspection_id)) {
+    throw createUserError('검사를 찾을 수 없습니다.');
+  }
+
+  appendRows(spreadsheet, {
+    inspection_records: [record],
+    record_defects: defects.map((defect_code) => ({
+      record_id: record.record_id,
+      defect_code: defect_code,
+    })),
+  });
+  updateRow(spreadsheet, {
+    tab: 'inspections',
+    key: 'inspection_id',
+    value: record.inspection_id,
+    changes: { content_version: record.content_version },
+  });
+  return { saved: 1 };
+}
+
+function listInspectionRecords(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const recordSheet = spreadsheet.getSheetByName('inspection_records');
+  const defectSheet = spreadsheet.getSheetByName('record_defects');
+  const records = recordSheet
+    ? readSheetRows(recordSheet)
+      .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId)
+      .map((row) => ({
+        ...row,
+        weight_g: row.weight_g === '' || row.weight_g === null ? null : Number(row.weight_g),
+        notes: row.notes === '' || row.notes === null ? '' : String(row.notes),
+        change_reason: row.change_reason === '' || row.change_reason === null ? '' : String(row.change_reason),
+        content_version: Number(row.content_version) || 0,
+      }))
+    : [];
+  const recordIds = new Set(records.map((record) => record.record_id));
+  const defects = defectSheet
+    ? readSheetRows(defectSheet).filter((row) => recordIds.has(row.record_id))
+    : [];
+  return { records: records, defects: defects };
+}
+
+function saveEvidenceQuery(spreadsheet, record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('근거 답을 확인하세요.');
+  }
+  if (typeof record.sources !== 'string') {
+    throw createUserError('근거 답의 출처는 JSON 글이어야 합니다.');
+  }
+  try {
+    JSON.parse(record.sources);
+  } catch (error) {
+    throw createUserError('근거 답의 출처를 읽을 수 없습니다.');
+  }
+  const appended = appendRows(spreadsheet, { evidence_queries: [record] });
+  return { saved: appended.added };
+}
+
+function listEvidenceQueries(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const sheet = spreadsheet.getSheetByName('evidence_queries');
+  if (!sheet) return { queries: [] };
+
+  const queries = readSheetRows(sheet)
+    .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId)
+    .map((row) => ({ ...row, sources: parseGeminiJsonCell(row.sources, []) }));
+  return { queries: queries };
+}
+
+function saveEvidenceLink(spreadsheet, record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw createUserError('대조 기록을 확인하세요.');
+  }
+  const appended = appendRows(spreadsheet, { evidence_links: [record] });
+  return { saved: appended.added };
+}
+
+function listEvidenceLinks(spreadsheet, inspectionId) {
+  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
+    throw createUserError('검사번호를 확인하세요.');
+  }
+  const sheet = spreadsheet.getSheetByName('evidence_links');
+  if (!sheet) return { links: [] };
+
+  const links = readSheetRows(sheet)
+    .filter((row) => inspectionId === undefined || row.inspection_id === inspectionId);
+  return { links: links };
+}
+
+function parseGeminiJsonCell(value, fallback) {
+  if (value === '' || value === null || value === undefined) return fallback;
+  try {
+    return JSON.parse(String(value));
+  } catch (error) {
+    throw createUserError('저장된 판독 결과를 읽을 수 없습니다.');
+  }
+}
+
+function runGemini(request) {
+  if (
+    !request ||
+    typeof request.instruction !== 'string' ||
+    typeof request.product_name !== 'string' ||
+    typeof request.weight !== 'string' ||
+    typeof request.revision !== 'string' ||
+    typeof request.standard !== 'string' ||
+    !Array.isArray(request.imageIds) ||
+    request.imageIds.length === 0
+  ) {
+    throw createUserError('판독에 필요한 검사 정보와 사진을 확인하세요.');
+  }
+
+  const apiKey = PropertiesService.getScriptProperties().getProperty('ONEPORT_API_KEY');
+  if (!apiKey) throw createUserError('OnePort 키가 없습니다.');
+
+  const content = [{
+    type: 'text',
+    text: [
+      request.instruction,
+      `검사 정보: 제품 ${request.product_name || '제품 미지정'}, 중량 ${request.weight || '미측정'}, 적용 검사기준 ${request.revision}.`,
+      `검사기준 원문:\n${request.standard}`,
+      '아래 6개 항목의 JSON으로만 답해 주세요: 판정, 불량유형, 관찰·수치 근거, 적용 기준과 출처, 권고 조치, 사람 승인 필요 여부. 판정은 OK, NG, HOLD 중 하나로 작성해 주세요.',
+    ].join('\n\n'),
+  }];
+  let totalImageBytes = 0;
+
+  request.imageIds.forEach((imageId) => {
+    if (typeof imageId !== 'string' || imageId === '') {
+      throw createUserError('등록된 사진이 없습니다.');
+    }
+
+    let file;
+    try {
+      file = DriveApp.getFileById(imageId);
+    } catch (error) {
+      throw createUserError('등록된 사진이 없습니다.');
+    }
+    const blob = file.getBlob();
+    const bytes = blob.getBytes();
+    const mimeType = blob.getContentType() || file.getMimeType();
+    if (!mimeType || mimeType.indexOf('image/') !== 0) {
+      throw createUserError('등록된 사진이 없습니다.');
+    }
+    totalImageBytes += bytes.length;
+    if (totalImageBytes > 3 * 1024 * 1024) {
+      throw createUserError('사진이 너무 커서 판독할 수 없습니다.');
+    }
+    content.push({
+      type: 'image_url',
+      image_url: { url: `data:${mimeType};base64,${Utilities.base64Encode(bytes)}` },
+    });
+  });
+
+  let response;
+  try {
+    response = UrlFetchApp.fetch('https://oneport.kr/v1/chat/completions', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: `Bearer ${apiKey}` },
+      payload: JSON.stringify({
+        model: 'gemini-3.8-flash',
+        messages: [{ role: 'user', content: content }],
+        response_format: { type: 'json_object' },
+        max_tokens: 8192,
+      }),
+      muteHttpExceptions: true,
+      timeoutSeconds: 120,
+    });
+  } catch (error) {
+    throw createUserError('OnePort에 연결하지 못했습니다. 2분쯤 뒤 다시 눌러 주세요.');
+  }
+
+  const statusCode = response.getResponseCode();
+  let responseBody = {};
+  try {
+    responseBody = JSON.parse(response.getContentText());
+  } catch (error) {
+    if (statusCode < 200 || statusCode >= 300) {
+      throw createUserError(getOnePortErrorMessage(statusCode, {}, apiKey));
+    }
+    throw createUserError('AI 응답 형식이 올바르지 않아 판독하지 못했습니다.');
+  }
+
+  if (statusCode < 200 || statusCode >= 300) {
+    throw createUserError(getOnePortErrorMessage(statusCode, responseBody, apiKey));
+  }
+
+  const contentText = responseBody && responseBody.choices && responseBody.choices[0] &&
+    responseBody.choices[0].message && responseBody.choices[0].message.content;
+  if (typeof contentText !== 'string') {
+    throw createUserError('AI 응답 형식이 올바르지 않아 판독하지 못했습니다.');
+  }
+
+  const jsonText = contentText.trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .trim();
+  let parsedResult;
+  try {
+    parsedResult = JSON.parse(jsonText);
+  } catch (error) {
+    throw createUserError('AI 응답 형식이 올바르지 않아 판독하지 못했습니다.');
+  }
+
+  const result = normalizeGeminiResult(parsedResult);
+  if (!result) throw createUserError('AI 응답 형식이 올바르지 않아 판독하지 못했습니다.');
+  return result;
+}
+
+function setOnePortKey(key) {
+  if (typeof key !== 'string' || key === '') {
+    throw createUserError('OnePort 키가 .env에 없습니다.');
+  }
+  PropertiesService.getScriptProperties().setProperty('ONEPORT_API_KEY', key);
+  return { saved: true };
+}
+
+function getOnePortErrorMessage(statusCode, responseBody, apiKey) {
+  const error = responseBody && responseBody.error && typeof responseBody.error === 'object'
+    ? responseBody.error
+    : {};
+  const safeMessage = sanitizeOnePortText(error.message || '요청에 실패했습니다.', apiKey);
+
+  if (statusCode === 401 && error.reason === 'key_revoked') {
+    return '이 OnePort 키는 꺼져 있습니다(코드 401). 다른 키로 바꿔 주세요.';
+  }
+  if (statusCode === 401) return 'OnePort 키가 맞지 않습니다(코드 401). 키를 다시 넣어 주세요.';
+  if (statusCode === 402) return 'OnePort 잔액이 부족해 판독하지 못했습니다(코드 402). 다른 키로 바꿔 주세요.';
+  if (statusCode === 403) return '이 OnePort 키로는 판독 모델을 쓸 수 없습니다(코드 403). 다른 키로 바꿔 주세요.';
+  if (statusCode === 404) return 'OnePort에서 판독 모델을 찾지 못했습니다(코드 404). 모델 이름을 확인해 주세요.';
+  if (statusCode === 413) return '사진이 너무 커서 판독할 수 없습니다(코드 413).';
+  if (
+    statusCode === 429 &&
+    (error.code === 'key_limit_exceeded' || error.type === 'key_limit_exceeded')
+  ) {
+    return 'OnePort 키의 사용 한도를 다 썼습니다(코드 429). 다른 키로 바꿔 주세요.';
+  }
+  if ([429, 500, 502, 503, 504].includes(statusCode)) {
+    return `AI 판독 서버가 붐빕니다(코드 ${statusCode}). 2분쯤 뒤 다시 눌러 주세요.`;
+  }
+  return `OnePort 오류(코드 ${statusCode}): ${safeMessage}`;
+}
+
+function sanitizeOnePortText(value, apiKey) {
+  let text = String(value);
+  if (apiKey) text = text.split(apiKey).join('[가림]');
+  return text.replace(/Bearer\s+[^\s"'`,}]+/gi, 'Bearer [가림]');
+}
+
+function updateRow(spreadsheet, request) {
   const sheet = spreadsheet.getSheetByName(request.tab);
-  if (!sheet || typeof request.key !== 'string' || !request.changes || typeof request.changes !== 'object' || Array.isArray(request.changes)) {
-    throw createUserError('\uC218\uC815\uD560 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
+  if (!sheet || !request || typeof request.key !== 'string' || !request.changes || typeof request.changes !== 'object') {
+    throw new Error('수정할 기록이 없습니다.');
   }
 
   const headers = getSheetHeaders(sheet);
   const keyColumn = headers.indexOf(request.key);
-  if (keyColumn < 0 || sheet.getLastRow() < 2) throw createUserError('\uC218\uC815\uD560 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
+  if (keyColumn < 0 || sheet.getLastRow() < 2) throw createUserError('수정할 기록이 없습니다.');
 
   const keyValues = sheet.getRange(2, keyColumn + 1, sheet.getLastRow() - 1, 1).getValues();
   const matchIndex = keyValues.findIndex((row) => valuesEqual(readCellValue(row[0]), request.value));
-  if (matchIndex < 0) throw createUserError('\uC218\uC815\uD560 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
+  if (matchIndex < 0) throw createUserError('수정할 기록이 없습니다.');
 
   const rowNumber = matchIndex + 2;
   Object.keys(request.changes).forEach((header) => {
@@ -237,42 +585,9 @@ function createUserError(message) {
   return error;
 }
 
-function saveGeminiResult(spreadsheet, record) {
-  if (!record || typeof record !== 'object' || Array.isArray(record)) {
-    throw createUserError('\uD310\uB3C5 \uACB0\uACFC\uB97C \uD655\uC778\uD558\uC138\uC694.');
-  }
-  if (typeof record.images !== 'string' || typeof record.result !== 'string') {
-    throw createUserError('\uD310\uB3C5 \uACB0\uACFC\uC758 \uC0AC\uC9C4\uACFC \uD56D\uBAA9\uC740 JSON \uAE00\uC774\uC5B4\uC57C \uD569\uB2C8\uB2E4.');
-  }
-  try {
-    JSON.parse(record.images);
-    JSON.parse(record.result);
-  } catch (error) {
-    throw createUserError('\uD310\uB3C5 \uACB0\uACFC\uC758 \uC0AC\uC9C4\uACFC \uD56D\uBAA9\uC744 \uC77D\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
-  }
-
-  const appended = appendRows(spreadsheet, { gemini_results: [record] });
-  return { saved: appended.added };
-}
-
-function listGeminiResults(spreadsheet, inspectionId) {
-  if (inspectionId !== undefined && typeof inspectionId !== 'string') {
-    throw createUserError('\uAC80\uC0AC\uBC88\uD638\uB97C \uD655\uC778\uD558\uC138\uC694.');
-  }
-
-  const sheet = spreadsheet.getSheetByName('gemini_results');
-  if (!sheet) return { results: [] };
-  const records = readSheetRows(sheet);
-  return {
-    results: inspectionId === undefined
-      ? records
-      : records.filter((record) => record.inspection_id === inspectionId),
-  };
-}
-
 function savePhoto(request) {
   if (typeof request.name !== 'string' || typeof request.mimeType !== 'string' || typeof request.base64 !== 'string') {
-    throw new Error('\uC0AC\uC9C4 \uC815\uBCF4\uB97C \uD655\uC778\uD558\uC138\uC694.');
+    throw new Error('사진 정보를 확인하세요.');
   }
 
   const properties = PropertiesService.getScriptProperties();
@@ -285,7 +600,7 @@ function savePhoto(request) {
 
 function getPhoto(fileId) {
   if (typeof fileId !== 'string' || fileId === '') {
-    throw createUserError('\uB4F1\uB85D\uB41C \uC0AC\uC9C4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
+    throw createUserError('등록된 사진이 없습니다.');
   }
 
   const properties = PropertiesService.getScriptProperties();
@@ -300,172 +615,7 @@ function getPhoto(fileId) {
       };
     }
   }
-  throw createUserError('\uB4F1\uB85D\uB41C \uC0AC\uC9C4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
-}
-
-function runGemini(request) {
-  if (
-    !request ||
-    typeof request.instruction !== 'string' ||
-    typeof request.product_name !== 'string' ||
-    typeof request.weight !== 'string' ||
-    typeof request.revision !== 'string' ||
-    typeof request.standard !== 'string' ||
-    !Array.isArray(request.imageIds) ||
-    request.imageIds.length === 0
-  ) {
-    throw createUserError('\uD310\uB3C5\uC5D0 \uD544\uC694\uD55C \uAC80\uC0AC \uC815\uBCF4\uC640 \uC0AC\uC9C4\uC744 \uD655\uC778\uD558\uC138\uC694.');
-  }
-
-  const apiKey = PropertiesService.getScriptProperties().getProperty('ONEPORT_API_KEY');
-  if (!apiKey) throw createUserError('OnePort \uD0A4\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.');
-
-  const content = [{
-    type: 'text',
-    text: [
-      request.instruction,
-      `\uAC80\uC0AC \uC815\uBCF4: \uC81C\uD488 ${request.product_name || '\uC81C\uD488 \uBBF8\uC9C0\uC815'}, \uC911\uB7C9 ${request.weight || '\uBBF8\uCE21\uC815'}, \uC801\uC6A9 \uAC80\uC0AC\uAE30\uC900 ${request.revision}.`,
-      `\uAC80\uC0AC\uAE30\uC900 \uC6D0\uBB38:\n${request.standard}`,
-      '\uC544\uB798 6\uAC1C \uD56D\uBAA9\uC758 JSON\uC73C\uB85C\uB9CC \uB2F5\uD574 \uC8FC\uC138\uC694: \uD310\uC815, \uBD88\uB7C9\uC720\uD615, \uAD00\uCC30\u00B7\uC218\uCE58 \uADFC\uAC70, \uC801\uC6A9 \uAE30\uC900\uACFC \uCD9C\uCC98, \uAD8C\uACE0 \uC870\uCE58, \uC0AC\uB78C \uC2B9\uC778 \uD544\uC694 \uC5EC\uBD80. \uD310\uC815\uC740 OK, NG, HOLD \uC911 \uD558\uB098\uB85C \uC791\uC131\uD574 \uC8FC\uC138\uC694.',
-    ].join('\n\n'),
-  }];
-  let totalImageBytes = 0;
-
-  request.imageIds.forEach((imageId) => {
-    if (typeof imageId !== 'string' || imageId === '') {
-      throw createUserError('\uB4F1\uB85D\uB41C \uC0AC\uC9C4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
-    }
-
-    let file;
-    try {
-      file = DriveApp.getFileById(imageId);
-    } catch (error) {
-      throw createUserError('\uB4F1\uB85D\uB41C \uC0AC\uC9C4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
-    }
-    const blob = file.getBlob();
-    const bytes = blob.getBytes();
-    const mimeType = blob.getContentType() || file.getMimeType();
-    if (!mimeType || mimeType.indexOf('image/') !== 0) {
-      throw createUserError('\uB4F1\uB85D\uB41C \uC0AC\uC9C4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.');
-    }
-    totalImageBytes += bytes.length;
-    if (totalImageBytes > 3 * 1024 * 1024) {
-      throw createUserError('\uC0AC\uC9C4\uC774 \uB108\uBB34 \uCEE4\uC11C \uD310\uB3C5\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
-    }
-    content.push({
-      type: 'image_url',
-      image_url: { url: `data:${mimeType};base64,${Utilities.base64Encode(bytes)}` },
-    });
-  });
-
-  let response;
-  try {
-    response = UrlFetchApp.fetch('https://oneport.kr/v1/chat/completions', {
-      method: 'post',
-      contentType: 'application/json',
-      headers: { Authorization: `Bearer ${apiKey}` },
-      payload: JSON.stringify({
-        model: 'gemini-3.8-flash',
-        messages: [{ role: 'user', content: content }],
-        response_format: { type: 'json_object' },
-        max_tokens: 8192,
-      }),
-      muteHttpExceptions: true,
-      timeoutSeconds: 120,
-    });
-  } catch (error) {
-    throw createUserError('OnePort\uC5D0 \uC5F0\uACB0\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4. 2\uBD84\uCBE4 \uB4A4 \uB2E4\uC2DC \uB20C\uB7EC \uC8FC\uC138\uC694.');
-  }
-
-  const statusCode = response.getResponseCode();
-  let responseBody = {};
-  try {
-    responseBody = JSON.parse(response.getContentText());
-  } catch (error) {
-    if (statusCode < 200 || statusCode >= 300) {
-      throw createUserError(getOnePortErrorMessage(statusCode, {}, apiKey));
-    }
-    throw createUserError('AI \uC751\uB2F5 \uD615\uC2DD\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544 \uD310\uB3C5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.');
-  }
-
-  if (statusCode < 200 || statusCode >= 300) {
-    throw createUserError(getOnePortErrorMessage(statusCode, responseBody, apiKey));
-  }
-
-  const contentText = responseBody && responseBody.choices && responseBody.choices[0] &&
-    responseBody.choices[0].message && responseBody.choices[0].message.content;
-  if (typeof contentText !== 'string') {
-    throw createUserError('AI \uC751\uB2F5 \uD615\uC2DD\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544 \uD310\uB3C5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.');
-  }
-
-  const jsonText = contentText.trim()
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/, '')
-    .trim();
-  let parsedResult;
-  try {
-    parsedResult = JSON.parse(jsonText);
-  } catch (error) {
-    throw createUserError('AI \uC751\uB2F5 \uD615\uC2DD\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544 \uD310\uB3C5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.');
-  }
-
-  const result = normalizeGeminiResult(parsedResult);
-  if (!result) throw createUserError('AI \uC751\uB2F5 \uD615\uC2DD\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544 \uD310\uB3C5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.');
-  return result;
-}
-
-function normalizeGeminiResult(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-  const fields = [
-    '\uD310\uC815',
-    '\uBD88\uB7C9\uC720\uD615',
-    '\uAD00\uCC30\u00B7\uC218\uCE58 \uADFC\uAC70',
-    '\uC801\uC6A9 \uAE30\uC900\uACFC \uCD9C\uCC98',
-    '\uAD8C\uACE0 \uC870\uCE58',
-    '\uC0AC\uB78C \uC2B9\uC778 \uD544\uC694 \uC5EC\uBD80',
-  ];
-  const result = {};
-  for (let index = 0; index < fields.length; index += 1) {
-    const field = fields[index];
-    if (typeof value[field] !== 'string') return null;
-    result[field] = value[field];
-  }
-  if (!['OK', 'NG', 'HOLD'].includes(result['\uD310\uC815'])) return null;
-  return result;
-}
-
-function getOnePortErrorMessage(statusCode, responseBody, apiKey) {
-  const error = responseBody && responseBody.error && typeof responseBody.error === 'object'
-    ? responseBody.error
-    : {};
-  const safeMessage = sanitizeOnePortText(error.message || '\uC694\uCCAD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.', apiKey);
-  if (statusCode === 401 && error.reason === 'key_revoked') return '\uC774 OnePort \uD0A4\uB294 \uAFBC\uC838 \uC788\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 401). \uB2E4\uB978 \uD0A4\uB85C \uBC14\uAFD4 \uC8FC\uC138\uC694.';
-  if (statusCode === 401) return 'OnePort \uD0A4\uAC00 \uB9DE\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 401). \uD0A4\uB97C \uB2E4\uC2DC \uB123\uC5B4 \uC8FC\uC138\uC694.';
-  if (statusCode === 402) return 'OnePort \uC794\uC561\uC774 \uBD80\uC871\uD574 \uD310\uB3C5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 402). \uB2E4\uB978 \uD0A4\uB85C \uBC14\uAFD4 \uC8FC\uC138\uC694.';
-  if (statusCode === 403) return '\uC774 OnePort \uD0A4\uB85C\uB294 \uD310\uB3C5 \uBAA8\uB378\uC744 \uC4F8 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 403). \uB2E4\uB978 \uD0A4\uB85C \uBC14\uAFD4 \uC8FC\uC138\uC694.';
-  if (statusCode === 404) return 'OnePort\uC5D0\uC11C \uD310\uB3C5 \uBAA8\uB378\uC744 \uCC3E\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 404). \uBAA8\uB378 \uC774\uB984\uC744 \uD655\uC778\uD574 \uC8FC\uC138\uC694.';
-  if (statusCode === 413) return '\uC0AC\uC9C4\uC774 \uB108\uBB34 \uCEE4\uC11C \uD310\uB3C5\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 413).';
-  if (statusCode === 429 && (error.code === 'key_limit_exceeded' || error.type === 'key_limit_exceeded')) {
-    return 'OnePort \uD0A4\uC758 \uC0AC\uC6A9 \uD55C\uB3C4\uB97C \uB2E4 \uC37C\uC2B5\uB2C8\uB2E4(\uCF54\uB4DC 429). \uB2E4\uB978 \uD0A4\uB85C \uBC14\uAFD4 \uC8FC\uC138\uC694.';
-  }
-  if ([429, 500, 502, 503, 504].includes(statusCode)) {
-    return `AI \uD310\uB3C5 \uC11C\uBC84\uAC00 \uBD90\uBE55\uB2C8\uB2E4(\uCF54\uB4DC ${statusCode}). 2\uBD84\uCBE4 \uB4A4 \uB2E4\uC2DC \uB20C\uB7EC \uC8FC\uC138\uC694.`;
-  }
-  return `OnePort \uC624\uB958(\uCF54\uB4DC ${statusCode}): ${safeMessage}`;
-}
-
-function sanitizeOnePortText(value, apiKey) {
-  let text = String(value);
-  if (apiKey) text = text.split(apiKey).join('[\uAC00\uB9BC]');
-  return text.replace(/Bearer\s+[^\s"'`,}]+/gi, 'Bearer [\uAC00\uB9BC]');
-}
-
-function setOnePortKey(key) {
-  if (typeof key !== 'string' || key === '') {
-    throw createUserError('OnePort \uD0A4\uAC00 .env\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4.');
-  }
-  PropertiesService.getScriptProperties().setProperty('ONEPORT_API_KEY', key);
-  return { saved: true };
+  throw createUserError('등록된 사진이 없습니다.');
 }
 
 function jsonOutput(value) {

@@ -1,4 +1,4 @@
-﻿const webAppUrl = process.env.GAS_WEBAPP_URL;
+const webAppUrl = process.env.GAS_WEBAPP_URL;
 const onePortKey = process.env.ONEPORT_API_KEY;
 if (!webAppUrl) {
   console.error('.env에 웹앱 주소가 없습니다. 먼저 npm.cmd run gas:deploy를 실행하세요.');

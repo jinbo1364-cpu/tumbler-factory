@@ -5,19 +5,16 @@ import {
   HttpException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { HttpAdapterHost } from '@nestjs/core';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
-  constructor(private readonly adapterHost: HttpAdapterHost) {}
-
   catch(exception: unknown, host: ArgumentsHost): void {
     const http = host.switchToHttp();
     const request = http.getRequest<Request>();
     const response = http.getResponse<Response>();
 
     if (request.path !== '/api' && !request.path.startsWith('/api/')) {
-      this.adapterHost.httpAdapter.reply(response, undefined, 500);
+      response.status(500).end();
       return;
     }
 
@@ -37,6 +34,6 @@ export class ApiExceptionFilter implements ExceptionFilter {
       }
     }
 
-    this.adapterHost.httpAdapter.reply(response, { error: message }, status);
+    response.status(status).json({ error: message });
   }
 }

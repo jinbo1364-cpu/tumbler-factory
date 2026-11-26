@@ -1,2 +1,13 @@
 node_modules
 dist
+.env
+.clasp.json
+runtime/local-state.json
+runtime/gemini-results.json
+runtime/custom-prompts.json
+runtime/uploads/
+notebooklm-login.bat
+start-server.bat
+test_mcp.js
+*.png
+*.jpg

@@ -10,17 +10,17 @@ var GEMINI_RESULT_FIELDS = [
 function normalizeGeminiResult(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
 
-  var result = {};
-  for (var index = 0; index < GEMINI_RESULT_FIELDS.length; index += 1) {
-    var field = GEMINI_RESULT_FIELDS[index];
+  const result = {};
+  for (let index = 0; index < GEMINI_RESULT_FIELDS.length; index += 1) {
+    const field = GEMINI_RESULT_FIELDS[index];
     if (typeof value[field] !== 'string') return null;
     result[field] = value[field];
   }
 
-  if (['OK', 'NG', 'HOLD'].indexOf(result['판정']) === -1) return null;
+  if (!['OK', 'NG', 'HOLD'].includes(result['판정'])) return null;
   return result;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { GEMINI_RESULT_FIELDS: GEMINI_RESULT_FIELDS, normalizeGeminiResult: normalizeGeminiResult };
+  module.exports = { GEMINI_RESULT_FIELDS, normalizeGeminiResult };
 }

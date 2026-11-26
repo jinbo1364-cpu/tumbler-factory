@@ -1,4 +1,4 @@
-﻿const { spawnSync } = require('node:child_process');
+const { spawnSync } = require('node:child_process');
 
 const webAppUrl = process.env.GAS_WEBAPP_URL;
 if (!webAppUrl) {
